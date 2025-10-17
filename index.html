@@ -30,7 +30,7 @@
     <div class="fixed top-5 right-4 left-4 hero-content text-center">
       <div class="max-w-md">
         <div class="join text-5xl text-right">
-          <h1>Find My<br />B.link</h1>
+          <span>Find My<br />B.link</span>
 
           <div id="phoneHolder" class="mt-3 -ml-4 text-info">
             <svg id="phone" class="rotate10 swap-on mx-4 h-20 w-20 fill-current" xmlns="http://www.w3.org/2000/svg"
@@ -131,6 +131,7 @@
 
     let currentState = STATE.WELCOME;
     let currentRole = ROLE.INITIATOR;
+    let blinkShared = false;
     let isBackgroundFlashing = false;
     let phoneColorTimeoutId = null;
     let shouldPauseBackground = true; // Paused by default (WELCOME state)
@@ -192,6 +193,12 @@
           break;
 
         case STATE.PAUSED:
+          // playButton visible, pauseButton hidden, cancelButton visible
+          playButton.classList.remove('hidden');
+          pauseButton.classList.add('hidden');
+          cancelButton.classList.remove('hidden');
+          instructions.classList.add('hidden');
+          countdownText.classList.add('hidden');
           // Pause background flashing and reset to default color
           shouldPauseBackground = true;
           isBackgroundFlashing = false;
@@ -202,6 +209,8 @@
 
     // Function to transition to a new state
     function setState(newState) {
+      const oldState = currentState;
+      console.log(`State change: ${oldState} -> ${newState}`);
       currentState = newState;
       updateUI();
     }
@@ -347,7 +356,6 @@
           return;
         }
 
-        // 1. Wait until the current time == startTime
         const now = Date.now();
         const waitTime = startTime - now;
         if (waitTime > 0) {
@@ -368,10 +376,8 @@
         // Change state to RUNNING when flashing starts
         setState(STATE.RUNNING);
 
-        // 2. Cycle through the characters in pattern
         let currentColor = color1Value;
         for (let i = 0; i < pattern.length; i++) {
-          // Check if we should pause during the pattern
           if (shouldPauseBackground) {
             isBackgroundFlashing = false;
             body.style.backgroundColor = defaultColor;
@@ -388,14 +394,13 @@
           // Determine wait time based on character
           let duration;
           if (char === '.') {
-            duration = 250; // 2.1 if the character is . then wait 250ms
+            duration = 250;
           } else if (char === '-') {
-            duration = 750; // 2.2 if the character is - then wait 750ms
+            duration = 750;
           }
 
           await new Promise(resolve => setTimeout(resolve, duration));
 
-          // Toggle between color1 and color2
           currentColor = currentColor === color1Value ? color2Value : color1Value;
         }
 
@@ -415,17 +420,12 @@
       runPattern();
     };
 
-    // Initialize when the page loads
     window.addEventListener('DOMContentLoaded', () => {
-      // Set up event listeners
       playButton.addEventListener('click', handlePlayClick);
       pauseButton.addEventListener('click', handlePauseClick);
       cancelButton.addEventListener('click', handleCancelClick);
 
-      // Initialize UI to WELCOME state
       updateUI();
-
-      // Start color animation
       animatePhoneColor();
     });
   </script>
