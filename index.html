@@ -25,12 +25,12 @@
   </style>
 </head>
 
-<body class="min-h-screen bg-base-200">
-  <div class="hero min-h-screen bg-base-200">
+<body class="min-h-screen">
+  <div class="hero min-h-screen">
     <div class="fixed top-5 right-4 left-4 hero-content text-center">
       <div class="max-w-md">
-        <div class="join">
-          <div class="text-5xl">Find My<br />B.link</div>
+        <div class="join text-5xl text-right">
+          <h1>Find My<br />B.link</h1>
 
           <div id="phoneHolder" class="mt-3 -ml-4 text-info">
             <svg id="phone" class="rotate10 swap-on mx-4 h-20 w-20 fill-current" xmlns="http://www.w3.org/2000/svg"
@@ -45,24 +45,19 @@
         <br />
 
         <div class="my-12 join">
-          <label class="swap swap-rotate">
-            <!-- this hidden checkbox controls the state -->
-            <input id="toggleCheckbox" type="checkbox" />
+          <svg id="playButton" class="mx-4 h-20 w-20 fill-current" xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24">
+            <path fill-rule="evenodd"
+              d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm14.024-.983a1.125 1.125 0 0 1 0 1.966l-5.603 3.113A1.125 1.125 0 0 1 9 15.113V8.887c0-.857.921-1.4 1.671-.983l5.603 3.113Z"
+              clip-rule="evenodd" />
+          </svg>
 
-            <svg id="playButton" class="swap-off mx-4 h-20 w-20 fill-current" xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24">
-              <path fill-rule="evenodd"
-                d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm14.024-.983a1.125 1.125 0 0 1 0 1.966l-5.603 3.113A1.125 1.125 0 0 1 9 15.113V8.887c0-.857.921-1.4 1.671-.983l5.603 3.113Z"
-                clip-rule="evenodd" />
-            </svg>
-
-            <svg id="pauseButton" class="swap-on mx-4 h-20 w-20 fill-current" xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24">
-              <path fill-rule="evenodd"
-                d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12ZM9 8.25a.75.75 0 0 0-.75.75v6c0 .414.336.75.75.75h.75a.75.75 0 0 0 .75-.75V9a.75.75 0 0 0-.75-.75H9Zm5.25 0a.75.75 0 0 0-.75.75v6c0 .414.336.75.75.75H15a.75.75 0 0 0 .75-.75V9a.75.75 0 0 0-.75-.75h-.75Z"
-                clip-rule="evenodd" />
-            </svg>
-          </label>
+          <svg id="pauseButton" class="mx-4 h-20 w-20 fill-current" xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24">
+            <path fill-rule="evenodd"
+              d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12ZM9 8.25a.75.75 0 0 0-.75.75v6c0 .414.336.75.75.75h.75a.75.75 0 0 0 .75-.75V9a.75.75 0 0 0-.75-.75H9Zm5.25 0a.75.75 0 0 0-.75.75v6c0 .414.336.75.75.75H15a.75.75 0 0 0 .75-.75V9a.75.75 0 0 0-.75-.75h-.75Z"
+              clip-rule="evenodd" />
+          </svg>
 
           <svg id="cancelButton" class="hidden swap-on mx-4 h-20 w-20 fill-current" xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24">
@@ -73,25 +68,27 @@
         </div>
 
         <div>
-          <p id="instructionText" class="-mt-4 mb-12 text-xl">Starting in 3</p>
+          <p id="countdownText" class="-mt-4 mb-12 text-xl">Starting in 3</p>
         </div>
 
-        <h2 class="text-xl font-bold text-left">How to use</h2>
-        <div class="text-left text-sm">
-          <p class="mt-2">Click the play button above. This will generate a unique Find My Blink (pattern and
-            colors) that can be sent to one (or more) people.</p>
+        <div id="instructions" class="text-left">
+          <h2 class="text-xl font-bold">How to use</h2>
+          <div class="text-sm">
+            <p class="mt-2">Click the play button above. This will generate a unique Find My Blink (pattern and
+              colors) that can be sent to one (or more) people.</p>
 
-          <p class="mt-2">Share the Find My Blink and their phone will synchronize with your flashing. Hold up
-            you phone screen to help them find you.</p>
+            <p class="mt-2">Share the Find My Blink and their phone will synchronize with your flashing. Hold up
+              you phone screen to help them find you.</p>
 
-          <p class="mt-2">No account is needed, no information is stored.</p>
+            <p class="mt-2">No account is needed, no information is stored.</p>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
   <script>
-    const patterns = [
+    const PATTERNS = [
       "..-..-.-..",
       ".-..-..-..",
       "...-..-.-.",
@@ -134,42 +131,71 @@
 
     let currentState = STATE.WELCOME;
     let currentRole = ROLE.INITIATOR;
+    let isBackgroundFlashing = false;
+    let phoneColorTimeoutId = null;
+    let shouldPauseBackground = true; // Paused by default (WELCOME state)
+    let countdownIntervalId = null;
 
     // Get DOM elements
     const playButton = document.getElementById('playButton');
     const pauseButton = document.getElementById('pauseButton');
     const cancelButton = document.getElementById('cancelButton');
-    const instructionText = document.getElementById('instructionText');
-    const swapContainer = playButton.closest('.swap');
-    const toggleCheckbox = document.getElementById('toggleCheckbox');
+    const countdownText = document.getElementById('countdownText');
+    const instructions = document.getElementById('instructions');
 
     // Function to update UI based on current state
     function updateUI() {
+      const body = document.body;
+      const defaultColor = getComputedStyle(document.documentElement).getPropertyValue('--color-base-200');
+
       switch (currentState) {
         case STATE.WELCOME:
-          // playButton visible, pauseButton hidden, cancelButton hidden, instructionText empty
-          swapContainer.classList.remove('hidden');
+          // playButton visible, pauseButton hidden, cancelButton hidden, countdownText empty
           playButton.classList.remove('hidden');
           pauseButton.classList.add('hidden');
           cancelButton.classList.add('hidden');
-          instructionText.innerHTML = "&nbsp;"
+          countdownText.innerHTML = "&nbsp;"
+          countdownText.classList.remove('hidden');
+          instructions.classList.remove('hidden');
+          // Clear countdown if running
+          if (countdownIntervalId) {
+            clearInterval(countdownIntervalId);
+            countdownIntervalId = null;
+          }
+          // Pause background flashing and reset to default color
+          shouldPauseBackground = true;
+          isBackgroundFlashing = false;
+          body.style.backgroundColor = defaultColor;
           break;
 
         case STATE.COUNTDOWN:
-          // playButton hidden, pauseButton hidden, cancelButton visible, instructionText shows countdown
-          swapContainer.classList.add('hidden');
+          // playButton hidden, pauseButton hidden, cancelButton visible, countdownText shows countdown
           playButton.classList.add('hidden');
           pauseButton.classList.add('hidden');
           cancelButton.classList.remove('hidden');
-          instructionText.textContent = 'Starting in 3';
+          countdownText.classList.remove('hidden');
+          countdownText.textContent = 'Starting in 3';
+          instructions.classList.add('hidden');
+          // Allow background flashing to start
+          shouldPauseBackground = false;
           break;
 
         case STATE.RUNNING:
-          // Add logic for RUNNING state if needed
+          // pauseButton visible, cancelButton visible, playButton hidden
+          playButton.classList.add('hidden');
+          pauseButton.classList.remove('hidden');
+          cancelButton.classList.remove('hidden');
+          instructions.classList.add('hidden');
+          countdownText.classList.add('hidden');
+          // Allow background flashing to continue
+          shouldPauseBackground = false;
           break;
 
         case STATE.PAUSED:
-          // Add logic for PAUSED state if needed
+          // Pause background flashing and reset to default color
+          shouldPauseBackground = true;
+          isBackgroundFlashing = false;
+          body.style.backgroundColor = defaultColor;
           break;
       }
     }
@@ -182,16 +208,59 @@
 
     // Event handlers
     function handlePlayClick() {
-      toggleCheckbox.checked = !toggleCheckbox.checked;
       setState(STATE.COUNTDOWN);
+      testRun();
     }
 
     function handlePauseClick() {
-      toggleCheckbox.checked = !toggleCheckbox.checked;
+      setState(STATE.PAUSED);
     }
 
     function handleCancelClick() {
       setState(STATE.WELCOME);
+    }
+
+    function getRandomColors() {
+      const color1 = COLORS[Math.floor(Math.random() * COLORS.length)]
+      const remaining = COLORS.filter(c => c !== color1)
+      const color2 = remaining[Math.floor(Math.random() * remaining.length)]
+      return {
+        color1: color1,
+        color2: color2,
+      }
+    }
+
+    function getNextStartTime(digit) {
+      // Get current time plus at least 2 seconds (2000ms)
+      const minTime = Date.now() + 2000;
+
+      // Round up to the next second
+      const nextSecond = Math.ceil(minTime / 1000) * 1000;
+
+      // Calculate the two valid ending digits
+      const digit1 = digit % 10;
+      const digit2 = (digit + 5) % 10;
+
+      // Get the last digit of the seconds
+      let currentSeconds = Math.floor(nextSecond / 1000) % 10;
+
+      // Check if we already end in one of the valid digits
+      if (currentSeconds === digit1 || currentSeconds === digit2) {
+        return nextSecond;
+      }
+
+      // Calculate how many seconds to add to reach digit1 or digit2
+      let stepsToDigit1 = (digit1 - currentSeconds + 10) % 10;
+      let stepsToDigit2 = (digit2 - currentSeconds + 10) % 10;
+
+      // Choose the smaller step (closest valid digit)
+      const stepsToAdd = Math.min(stepsToDigit1, stepsToDigit2);
+
+      return nextSecond + (stepsToAdd * 1000);
+    }
+
+    function getRandomPattern() {
+      return PATTERNS[Math.floor(Math.random() * PATTERNS.length)]
     }
 
     // Animate phoneHolder color changes
@@ -199,6 +268,14 @@
       const phoneHolder = document.getElementById('phoneHolder');
 
       function changeColor() {
+        // If state is RUNNING, set phone to white and stop color animation
+        if (currentState === STATE.RUNNING) {
+          phoneHolder.style.color = 'white';
+          // Check again later to resume when state changes
+          phoneColorTimeoutId = setTimeout(changeColor, 100);
+          return;
+        }
+
         // Pick a random color from the COLORS array
         const randomColor = COLORS[Math.floor(Math.random() * COLORS.length)];
         const colorValue = getComputedStyle(document.documentElement).getPropertyValue(randomColor);
@@ -208,12 +285,135 @@
 
         // Wait either 250ms or 750ms before changing again
         const waitTime = Math.random() < 0.5 ? 250 : 750;
-        setTimeout(changeColor, waitTime);
+        phoneColorTimeoutId = setTimeout(changeColor, waitTime);
       }
 
       // Start the animation
       changeColor();
     }
+
+    function testRun() {
+      colors = getRandomColors();
+      pattern = getRandomPattern();
+      time = getNextStartTime(3);
+
+      console.log(new Date(time).toLocaleTimeString());
+
+      startCountdown(time);
+      animateBackgroundColor(colors.color1, colors.color2, pattern, time);
+    }
+
+    function startCountdown(startTime) {
+      // Clear any existing countdown
+      if (countdownIntervalId) {
+        clearInterval(countdownIntervalId);
+      }
+
+      function updateCountdown() {
+        const now = Date.now();
+        const timeLeft = startTime - now;
+
+        if (timeLeft <= 0) {
+          clearInterval(countdownIntervalId);
+          countdownIntervalId = null;
+          return;
+        }
+
+        const secondsLeft = Math.ceil(timeLeft / 1000);
+        countdownText.textContent = `Starting in ${secondsLeft}`;
+      }
+
+      // Update immediately
+      updateCountdown();
+
+      // Then update every 100ms for smooth countdown
+      countdownIntervalId = setInterval(updateCountdown, 100);
+    }
+
+    function animateBackgroundColor(color1, color2, pattern, startTime) {
+      const body = document.body;
+      const phoneHolder = document.getElementById('phoneHolder');
+
+      // Get the actual color values from CSS variables
+      const color1Value = getComputedStyle(document.documentElement).getPropertyValue(color1);
+      const color2Value = getComputedStyle(document.documentElement).getPropertyValue(color2);
+      const defaultColor = getComputedStyle(document.documentElement).getPropertyValue('--color-base-200');
+
+      async function runPattern() {
+        // Check if we should pause - if so, wait and check again
+        if (shouldPauseBackground) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+          runPattern();
+          return;
+        }
+
+        // 1. Wait until the current time == startTime
+        const now = Date.now();
+        const waitTime = startTime - now;
+        if (waitTime > 0) {
+          await new Promise(resolve => setTimeout(resolve, waitTime));
+        }
+
+        // Check again if we should pause before starting the pattern
+        if (shouldPauseBackground) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+          runPattern();
+          return;
+        }
+
+        // Set flag to indicate background is flashing
+        isBackgroundFlashing = true;
+        phoneHolder.style.color = 'white';
+
+        // Change state to RUNNING when flashing starts
+        setState(STATE.RUNNING);
+
+        // 2. Cycle through the characters in pattern
+        let currentColor = color1Value;
+        for (let i = 0; i < pattern.length; i++) {
+          // Check if we should pause during the pattern
+          if (shouldPauseBackground) {
+            isBackgroundFlashing = false;
+            body.style.backgroundColor = defaultColor;
+            await new Promise(resolve => setTimeout(resolve, 100));
+            runPattern();
+            return;
+          }
+
+          const char = pattern[i];
+
+          // Toggle the background color
+          body.style.backgroundColor = currentColor;
+
+          // Determine wait time based on character
+          let duration;
+          if (char === '.') {
+            duration = 250; // 2.1 if the character is . then wait 250ms
+          } else if (char === '-') {
+            duration = 750; // 2.2 if the character is - then wait 750ms
+          }
+
+          await new Promise(resolve => setTimeout(resolve, duration));
+
+          // Toggle between color1 and color2
+          currentColor = currentColor === color1Value ? color2Value : color1Value;
+        }
+
+        // 3. When the pattern ends, make the background color the default color and wait 1000ms
+        body.style.backgroundColor = defaultColor;
+
+        // Clear flag to allow phone color animation to resume
+        isBackgroundFlashing = false;
+
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // 4. Restart the loop
+        runPattern();
+      }
+
+      // Start the animation
+      runPattern();
+    };
 
     // Initialize when the page loads
     window.addEventListener('DOMContentLoaded', () => {
