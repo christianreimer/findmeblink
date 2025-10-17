@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+  <meta charSet="utf-8" data-next-head="" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Find My B.link</title>
+  <meta name="description" content="Find My B.link helps you stand out when you need to be seen.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet" type="text/css">
+
+  <style>
+    .rotate10 {
+      transform: rotate(10deg);
+      transform-origin: center;
+    }
+
+    #phoneHolder {
+      transition: color 150ms ease-in-out;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen bg-base-200">
+  <div class="hero min-h-screen bg-base-200">
+    <div class="fixed top-5 right-4 left-4 hero-content text-center">
+      <div class="max-w-md">
+        <div class="join">
+          <div class="text-5xl">Find My<br />B.link</div>
+
+          <div id="phoneHolder" class="mt-3 -ml-4 text-info">
+            <svg id="phone" class="rotate10 swap-on mx-4 h-20 w-20 fill-current" xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24" fill="currentColor">
+              <path fill-rule="evenodd"
+                d="M8.625.75A3.375 3.375 0 0 0 5.25 4.125v15.75a3.375 3.375 0 0 0 3.375 3.375h6.75a3.375 3.375 0 0 0 3.375-3.375V4.125A3.375 3.375 0 0 0 15.375.75h-6.75ZM7.5 4.125C7.5 3.504 8.004 3 8.625 3H9.75v.375c0 .621.504 1.125 1.125 1.125h2.25c.621 0 1.125-.504 1.125-1.125V3h1.125c.621 0 1.125.504 1.125 1.125v15.75c0 .621-.504 1.125-1.125 1.125h-6.75A1.125 1.125 0 0 1 7.5 19.875V4.125Z"
+                clip-rule="evenodd" />
+            </svg>
+          </div>
+        </div>
+
+        <br />
+
+        <div class="my-12 join">
+          <label class="swap swap-rotate">
+            <!-- this hidden checkbox controls the state -->
+            <input id="toggleCheckbox" type="checkbox" />
+
+            <svg id="playButton" class="swap-off mx-4 h-20 w-20 fill-current" xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24">
+              <path fill-rule="evenodd"
+                d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm14.024-.983a1.125 1.125 0 0 1 0 1.966l-5.603 3.113A1.125 1.125 0 0 1 9 15.113V8.887c0-.857.921-1.4 1.671-.983l5.603 3.113Z"
+                clip-rule="evenodd" />
+            </svg>
+
+            <svg id="pauseButton" class="swap-on mx-4 h-20 w-20 fill-current" xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24">
+              <path fill-rule="evenodd"
+                d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12ZM9 8.25a.75.75 0 0 0-.75.75v6c0 .414.336.75.75.75h.75a.75.75 0 0 0 .75-.75V9a.75.75 0 0 0-.75-.75H9Zm5.25 0a.75.75 0 0 0-.75.75v6c0 .414.336.75.75.75H15a.75.75 0 0 0 .75-.75V9a.75.75 0 0 0-.75-.75h-.75Z"
+                clip-rule="evenodd" />
+            </svg>
+          </label>
+
+          <svg id="cancelButton" class="hidden swap-on mx-4 h-20 w-20 fill-current" xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24">
+            <path fill-rule="evenodd"
+              d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.72 6.97a.75.75 0 1 0-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 1 0 1.06 1.06L12 13.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L13.06 12l1.72-1.72a.75.75 0 1 0-1.06-1.06L12 10.94l-1.72-1.72Z"
+              clip-rule="evenodd" />
+          </svg>
+        </div>
+
+        <div>
+          <p id="instructionText" class="-mt-4 mb-12 text-xl">Starting in 3</p>
+        </div>
+
+        <h2 class="text-xl font-bold text-left">How to use</h2>
+        <div class="text-left text-sm">
+          <p class="mt-2">Click the play button above. This will generate a unique Find My Blink (pattern and
+            colors) that can be sent to one (or more) people.</p>
+
+          <p class="mt-2">Share the Find My Blink and their phone will synchronize with your flashing. Hold up
+            you phone screen to help them find you.</p>
+
+          <p class="mt-2">No account is needed, no information is stored.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const patterns = [
+      "..-..-.-..",
+      ".-..-..-..",
+      "...-..-.-.",
+      ".-...-.-..",
+      "-.-.-.-.",
+      ".-.-.-.-",
+      "-..-.-.-",
+      "..-.-.--",
+      "-----.",
+      "----.-",
+    ]
+
+    const COLORS = [
+      "--color-secondary",
+      "--color-accent",
+      "--color-info",
+      "--color-success",
+      "--color-warning",
+      "--color-error",
+    ]
+
+    const STATE = {
+      WELCOME: 'welcome',
+      COUNTDOWN: 'countdown',
+      RUNNING: 'running',
+      PAUSED: 'paused',
+    };
+
+    const ROLE = {
+      INITIATOR: 'initiator',
+      RECEIVER: 'receiver',
+    }
+
+    const DURATIONS = {
+      BETWEEN: 100,
+      DOT: 250,
+      DASH: 750,
+      SPACE: 1000,
+    }
+
+    let currentState = STATE.WELCOME;
+    let currentRole = ROLE.INITIATOR;
+
+    // Get DOM elements
+    const playButton = document.getElementById('playButton');
+    const pauseButton = document.getElementById('pauseButton');
+    const cancelButton = document.getElementById('cancelButton');
+    const instructionText = document.getElementById('instructionText');
+    const swapContainer = playButton.closest('.swap');
+    const toggleCheckbox = document.getElementById('toggleCheckbox');
+
+    // Function to update UI based on current state
+    function updateUI() {
+      switch (currentState) {
+        case STATE.WELCOME:
+          // playButton visible, pauseButton hidden, cancelButton hidden, instructionText empty
+          swapContainer.classList.remove('hidden');
+          playButton.classList.remove('hidden');
+          pauseButton.classList.add('hidden');
+          cancelButton.classList.add('hidden');
+          instructionText.innerHTML = "&nbsp;"
+          break;
+
+        case STATE.COUNTDOWN:
+          // playButton hidden, pauseButton hidden, cancelButton visible, instructionText shows countdown
+          swapContainer.classList.add('hidden');
+          playButton.classList.add('hidden');
+          pauseButton.classList.add('hidden');
+          cancelButton.classList.remove('hidden');
+          instructionText.textContent = 'Starting in 3';
+          break;
+
+        case STATE.RUNNING:
+          // Add logic for RUNNING state if needed
+          break;
+
+        case STATE.PAUSED:
+          // Add logic for PAUSED state if needed
+          break;
+      }
+    }
+
+    // Function to transition to a new state
+    function setState(newState) {
+      currentState = newState;
+      updateUI();
+    }
+
+    // Event handlers
+    function handlePlayClick() {
+      toggleCheckbox.checked = !toggleCheckbox.checked;
+      setState(STATE.COUNTDOWN);
+    }
+
+    function handlePauseClick() {
+      toggleCheckbox.checked = !toggleCheckbox.checked;
+    }
+
+    function handleCancelClick() {
+      setState(STATE.WELCOME);
+    }
+
+    // Animate phoneHolder color changes
+    function animatePhoneColor() {
+      const phoneHolder = document.getElementById('phoneHolder');
+
+      function changeColor() {
+        // Pick a random color from the COLORS array
+        const randomColor = COLORS[Math.floor(Math.random() * COLORS.length)];
+        const colorValue = getComputedStyle(document.documentElement).getPropertyValue(randomColor);
+
+        // Update the color
+        phoneHolder.style.color = colorValue;
+
+        // Wait either 250ms or 750ms before changing again
+        const waitTime = Math.random() < 0.5 ? 250 : 750;
+        setTimeout(changeColor, waitTime);
+      }
+
+      // Start the animation
+      changeColor();
+    }
+
+    // Initialize when the page loads
+    window.addEventListener('DOMContentLoaded', () => {
+      // Set up event listeners
+      playButton.addEventListener('click', handlePlayClick);
+      pauseButton.addEventListener('click', handlePauseClick);
+      cancelButton.addEventListener('click', handleCancelClick);
+
+      // Initialize UI to WELCOME state
+      updateUI();
+
+      // Start color animation
+      animatePhoneColor();
+    });
+  </script>
+
+</body>
+
+</html>
