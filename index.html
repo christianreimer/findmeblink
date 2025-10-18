@@ -8,6 +8,22 @@
   <meta name="mobile-web-app-capable" content="yes">
   <title>Find My B.link</title>
   <meta name="description" content="Find My B.link helps you stand out when you need to be seen.">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://findmyb.link/">
+  <meta property="og:title" content="Find My B.link">
+  <meta property="og:description" content="Sync your screen flashing to find each other in crowds. No account needed!">
+  <meta property="og:image" content="https://findmyb.link/preview.png">
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://findmyb.link/">
+  <meta property="twitter:title" content="Find My B.link">
+  <meta property="twitter:description"
+    content="Sync your screen flashing to find each other in crowds. No account needed!">
+  <meta property="twitter:image" content="https://findmyb.link/preview.png">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -229,7 +245,7 @@
     }
 
     // Event handlers
-    function handlePlayClick() {
+    async function handlePlayClick() {
       // Initialize blinkConfig on first play if it's not set (for INITIATOR role)
       if (blinkConfig === null && currentRole === ROLE.INITIATOR) {
         const colors = getRandomColors();
@@ -246,6 +262,30 @@
         };
 
         console.log('Initialized blinkConfig on first play:', blinkConfig);
+
+        // Encode URL and share when INITIATOR first starts
+        const shareUrl = encodeUrl();
+
+        console.log(`Encoded url:${shareUrl}`)
+
+        // Use Web Share API if available
+        if (navigator.share) {
+          try {
+            await navigator.share({
+              title: 'Find My B.link',
+              text: 'Use this link to sync your screen flashing with mine!',
+              url: shareUrl
+            });
+            console.log('Shared successfully');
+          } catch (error) {
+            // User cancelled or share failed
+            if (error.name !== 'AbortError') {
+              console.error('Error sharing:', error);
+            }
+          }
+        } else {
+          console.log('Web Share API not available. URL encoded:', shareUrl);
+        }
       }
 
       // Calculate next start time and begin countdown/blinking
@@ -467,13 +507,75 @@
       runPattern();
     };
 
+    function encodeUrl() {
+      if (!blinkConfig) return;
+
+      // Find indices of colors and pattern
+      const color1Index = COLORS.indexOf(blinkConfig.color1);
+      const color2Index = COLORS.indexOf(blinkConfig.color2);
+      const patternIndex = PATTERNS.indexOf(blinkConfig.pattern);
+
+      // Create URL with query parameters
+      const params = new URLSearchParams();
+      params.set('c1', color1Index);
+      params.set('c2', color2Index);
+      params.set('p', patternIndex);
+      params.set('t', blinkConfig.timeOffset);
+
+      const newUrl = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+      window.history.replaceState({}, '', newUrl);
+
+      return newUrl;
+    }
+
+    function decodeUrl() {
+      const params = new URLSearchParams(window.location.search);
+
+      // Check if all required parameters exist
+      if (!params.has('c1') || !params.has('c2') || !params.has('p') || !params.has('t')) {
+        return null;
+      }
+
+      // Parse indices
+      const color1Index = parseInt(params.get('c1'));
+      const color2Index = parseInt(params.get('c2'));
+      const patternIndex = parseInt(params.get('p'));
+      const timeOffset = parseInt(params.get('t'));
+
+      // Validate indices are within bounds
+      if (color1Index < 0 || color1Index >= COLORS.length ||
+        color2Index < 0 || color2Index >= COLORS.length ||
+        patternIndex < 0 || patternIndex >= PATTERNS.length ||
+        timeOffset < 0 || timeOffset > 9) {
+        return null;
+      }
+
+      // Return decoded blinkConfig
+      return {
+        color1: COLORS[color1Index],
+        color2: COLORS[color2Index],
+        pattern: PATTERNS[patternIndex],
+        timeOffset: timeOffset
+      };
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
+      // Check if URL contains encoded blinkConfig
       playButton.addEventListener('click', handlePlayClick);
       pauseButton.addEventListener('click', handlePauseClick);
       cancelButton.addEventListener('click', handleCancelClick);
 
       updateUI();
       animatePhoneColor();
+
+      const decodedConfig = decodeUrl();
+      if (decodedConfig) {
+        // Set as receiver and use the decoded config
+        blinkConfig = decodedConfig;
+        currentRole = ROLE.RECEIVER;
+        console.log('Receiver mode: blinkConfig loaded from URL', blinkConfig);
+        handlePlayClick();
+      }
     });
   </script>
 
