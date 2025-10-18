@@ -132,12 +132,12 @@
 
     let currentState = STATE.WELCOME;
     let currentRole = ROLE.INITIATOR;
-    let blinkShared = false;
     let blinkConfig = null;
     let isBackgroundFlashing = false;
     let phoneColorTimeoutId = null;
     let shouldPauseBackground = true; // Paused by default (WELCOME state)
     let countdownIntervalId = null;
+    let currentAnimationId = 0; // Track the current animation to cancel old ones
 
     // Get DOM elements
     const playButton = document.getElementById('playButton');
@@ -213,7 +213,7 @@
           pauseButton.classList.remove('hidden');
           cancelButton.classList.remove('hidden');
           instructions.classList.add('hidden');
-          countdownText.classList.add('hidden');
+          countdownText.classList.remove('hidden');
           // Allow background flashing to continue
           shouldPauseBackground = false;
           break;
@@ -230,28 +230,32 @@
 
     // Event handlers
     function handlePlayClick() {
+      // Initialize blinkConfig on first play if it's not set (for INITIATOR role)
+      if (blinkConfig === null && currentRole === ROLE.INITIATOR) {
+        const colors = getRandomColors();
+        const pattern = getRandomPattern();
+
+        // Random number between 0 and 4
+        const timeOffset = Math.floor(Math.random() * 5);
+
+        blinkConfig = {
+          color1: colors.color1,
+          color2: colors.color2,
+          pattern: pattern,
+          timeOffset: timeOffset
+        };
+
+        console.log('Initialized blinkConfig on first play:', blinkConfig);
+      }
+
+      // Calculate next start time and begin countdown/blinking
       if (currentState === STATE.PAUSED) {
         setState(STATE.RESUMED);
       } else {
-        // Initialize blinkConfig on first play if it's not set (for INITIATOR role)
-        if (blinkConfig === null && currentRole === ROLE.INITIATOR) {
-          const colors = getRandomColors();
-          const pattern = getRandomPattern();
-          const timeOffset = Math.floor(Math.random() * 6); // Random number between 0 and 5
-
-          blinkConfig = {
-            color1: colors.color1,
-            color2: colors.color2,
-            pattern: pattern,
-            timeOffset: timeOffset
-          };
-
-          console.log('Initialized blinkConfig on first play:', blinkConfig);
-        }
-
         setState(STATE.COUNTDOWN);
-        testRun();
       }
+
+      testRun();
     }
 
     function handlePauseClick() {
@@ -274,23 +278,22 @@
     }
 
     function getNextStartTime(digit) {
-      const minTime = Date.now() + 2000;
-      const nextSecond = Math.ceil(minTime / 1000) * 1000;
+      const now = Date.now();
+      const currentSecond = Math.floor(now / 1000);
       const digit1 = digit % 10;
       const digit2 = (digit + 5) % 10;
 
-      let currentSeconds = Math.floor(nextSecond / 1000) % 10;
+      // Start checking from the next full second
+      let candidateSecond = currentSecond + 1;
 
-      if (currentSeconds === digit1 || currentSeconds === digit2) {
-        return nextSecond;
+      // Find the next second that ends in digit1 or digit2
+      while (true) {
+        const lastDigit = candidateSecond % 10;
+        if (lastDigit === digit1 || lastDigit === digit2) {
+          return candidateSecond * 1000;
+        }
+        candidateSecond++;
       }
-
-      let stepsToDigit1 = (digit1 - currentSeconds + 10) % 10;
-      let stepsToDigit2 = (digit2 - currentSeconds + 10) % 10;
-
-      const stepsToAdd = Math.min(stepsToDigit1, stepsToDigit2);
-
-      return nextSecond + (stepsToAdd * 1000);
     }
 
     function getRandomPattern() {
@@ -327,10 +330,14 @@
     }
 
     function testRun() {
+      // Increment animation ID to cancel any previous animations
+      currentAnimationId++;
+      const animationId = currentAnimationId;
+
       startTime = getNextStartTime(blinkConfig.timeOffset);
       console.log(`Starttime: ${new Date(startTime).toLocaleTimeString()}`);
       startCountdown(startTime);
-      animateBackgroundColor(blinkConfig, startTime);
+      animateBackgroundColor(blinkConfig, startTime, animationId);
     }
 
     function startCountdown(startTime) {
@@ -360,7 +367,7 @@
       countdownIntervalId = setInterval(updateCountdown, 100);
     }
 
-    function animateBackgroundColor(config, startTime) {
+    function animateBackgroundColor(config, startTime, animationId) {
       const body = document.body;
       const phoneHolder = document.getElementById('phoneHolder');
 
@@ -370,6 +377,11 @@
       const defaultColor = getComputedStyle(document.documentElement).getPropertyValue('--color-base-200');
 
       async function runPattern() {
+        // Check if this animation has been cancelled
+        if (animationId !== currentAnimationId) {
+          return;
+        }
+
         // Check if we should pause - if so, wait and check again
         if (shouldPauseBackground) {
           await new Promise(resolve => setTimeout(resolve, 100));
@@ -381,6 +393,11 @@
         const waitTime = startTime - now;
         if (waitTime > 0) {
           await new Promise(resolve => setTimeout(resolve, waitTime));
+        }
+
+        // Check again if this animation has been cancelled after waiting
+        if (animationId !== currentAnimationId) {
+          return;
         }
 
         // Check again if we should pause before starting the pattern
@@ -399,6 +416,13 @@
 
         let currentColor = color1Value;
         for (let i = 0; i < config.pattern.length; i++) {
+          // Check if this animation has been cancelled
+          if (animationId !== currentAnimationId) {
+            isBackgroundFlashing = false;
+            body.style.backgroundColor = defaultColor;
+            return;
+          }
+
           if (shouldPauseBackground) {
             isBackgroundFlashing = false;
             body.style.backgroundColor = defaultColor;
@@ -425,15 +449,22 @@
           currentColor = currentColor === color1Value ? color2Value : color1Value;
         }
 
-        // 3. When the pattern ends, make the background color the default color and wait 1000ms
+        // When the pattern ends, make the background color the default color
         body.style.backgroundColor = defaultColor;
 
         // Clear flag to allow phone color animation to resume
         isBackgroundFlashing = false;
 
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        // Calculate the next start time and wait for it
+        const nextStartTime = getNextStartTime(config.timeOffset);
+        const currentTime = Date.now();
+        const delayUntilNext = nextStartTime - currentTime;
 
-        // 4. Restart the loop
+        if (delayUntilNext > 0) {
+          await new Promise(resolve => setTimeout(resolve, delayUntilNext));
+        }
+
+        // Restart the loop
         runPattern();
       }
 
