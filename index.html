@@ -115,6 +115,7 @@
       COUNTDOWN: 'countdown',
       RUNNING: 'running',
       PAUSED: 'paused',
+      RESUMED: 'resumed',
     };
 
     const ROLE = {
@@ -132,6 +133,7 @@
     let currentState = STATE.WELCOME;
     let currentRole = ROLE.INITIATOR;
     let blinkShared = false;
+    let blinkConfig = null;
     let isBackgroundFlashing = false;
     let phoneColorTimeoutId = null;
     let shouldPauseBackground = true; // Paused by default (WELCOME state)
@@ -204,6 +206,17 @@
           isBackgroundFlashing = false;
           body.style.backgroundColor = defaultColor;
           break;
+
+        case STATE.RESUMED:
+          // playButton hidden, pauseButton visible, cancelButton visible
+          playButton.classList.add('hidden');
+          pauseButton.classList.remove('hidden');
+          cancelButton.classList.remove('hidden');
+          instructions.classList.add('hidden');
+          countdownText.classList.add('hidden');
+          // Allow background flashing to continue
+          shouldPauseBackground = false;
+          break;
       }
     }
 
@@ -217,8 +230,28 @@
 
     // Event handlers
     function handlePlayClick() {
-      setState(STATE.COUNTDOWN);
-      testRun();
+      if (currentState === STATE.PAUSED) {
+        setState(STATE.RESUMED);
+      } else {
+        // Initialize blinkConfig on first play if it's not set (for INITIATOR role)
+        if (blinkConfig === null && currentRole === ROLE.INITIATOR) {
+          const colors = getRandomColors();
+          const pattern = getRandomPattern();
+          const timeOffset = Math.floor(Math.random() * 6); // Random number between 0 and 5
+
+          blinkConfig = {
+            color1: colors.color1,
+            color2: colors.color2,
+            pattern: pattern,
+            timeOffset: timeOffset
+          };
+
+          console.log('Initialized blinkConfig on first play:', blinkConfig);
+        }
+
+        setState(STATE.COUNTDOWN);
+        testRun();
+      }
     }
 
     function handlePauseClick() {
@@ -226,6 +259,7 @@
     }
 
     function handleCancelClick() {
+      blinkConfig = null;
       setState(STATE.WELCOME);
     }
 
@@ -240,29 +274,20 @@
     }
 
     function getNextStartTime(digit) {
-      // Get current time plus at least 2 seconds (2000ms)
       const minTime = Date.now() + 2000;
-
-      // Round up to the next second
       const nextSecond = Math.ceil(minTime / 1000) * 1000;
-
-      // Calculate the two valid ending digits
       const digit1 = digit % 10;
       const digit2 = (digit + 5) % 10;
 
-      // Get the last digit of the seconds
       let currentSeconds = Math.floor(nextSecond / 1000) % 10;
 
-      // Check if we already end in one of the valid digits
       if (currentSeconds === digit1 || currentSeconds === digit2) {
         return nextSecond;
       }
 
-      // Calculate how many seconds to add to reach digit1 or digit2
       let stepsToDigit1 = (digit1 - currentSeconds + 10) % 10;
       let stepsToDigit2 = (digit2 - currentSeconds + 10) % 10;
 
-      // Choose the smaller step (closest valid digit)
       const stepsToAdd = Math.min(stepsToDigit1, stepsToDigit2);
 
       return nextSecond + (stepsToAdd * 1000);
@@ -302,14 +327,10 @@
     }
 
     function testRun() {
-      colors = getRandomColors();
-      pattern = getRandomPattern();
-      time = getNextStartTime(3);
-
-      console.log(new Date(time).toLocaleTimeString());
-
-      startCountdown(time);
-      animateBackgroundColor(colors.color1, colors.color2, pattern, time);
+      startTime = getNextStartTime(blinkConfig.timeOffset);
+      console.log(`Starttime: ${new Date(startTime).toLocaleTimeString()}`);
+      startCountdown(startTime);
+      animateBackgroundColor(blinkConfig, startTime);
     }
 
     function startCountdown(startTime) {
@@ -339,13 +360,13 @@
       countdownIntervalId = setInterval(updateCountdown, 100);
     }
 
-    function animateBackgroundColor(color1, color2, pattern, startTime) {
+    function animateBackgroundColor(config, startTime) {
       const body = document.body;
       const phoneHolder = document.getElementById('phoneHolder');
 
       // Get the actual color values from CSS variables
-      const color1Value = getComputedStyle(document.documentElement).getPropertyValue(color1);
-      const color2Value = getComputedStyle(document.documentElement).getPropertyValue(color2);
+      const color1Value = getComputedStyle(document.documentElement).getPropertyValue(config.color1);
+      const color2Value = getComputedStyle(document.documentElement).getPropertyValue(config.color2);
       const defaultColor = getComputedStyle(document.documentElement).getPropertyValue('--color-base-200');
 
       async function runPattern() {
@@ -377,7 +398,7 @@
         setState(STATE.RUNNING);
 
         let currentColor = color1Value;
-        for (let i = 0; i < pattern.length; i++) {
+        for (let i = 0; i < config.pattern.length; i++) {
           if (shouldPauseBackground) {
             isBackgroundFlashing = false;
             body.style.backgroundColor = defaultColor;
@@ -386,7 +407,7 @@
             return;
           }
 
-          const char = pattern[i];
+          const char = config.pattern[i];
 
           // Toggle the background color
           body.style.backgroundColor = currentColor;
