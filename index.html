@@ -255,7 +255,13 @@
         setState(STATE.COUNTDOWN);
       }
 
-      testRun();
+      currentAnimationId++;
+      const animationId = currentAnimationId;
+
+      startTime = getNextStartTime(blinkConfig.timeOffset);
+      console.log(`Starttime: ${new Date(startTime).toLocaleTimeString()}`);
+      startCountdown(startTime);
+      animateBackgroundColor(blinkConfig, startTime, animationId);
     }
 
     function handlePauseClick() {
@@ -327,17 +333,6 @@
 
       // Start the animation
       changeColor();
-    }
-
-    function testRun() {
-      // Increment animation ID to cancel any previous animations
-      currentAnimationId++;
-      const animationId = currentAnimationId;
-
-      startTime = getNextStartTime(blinkConfig.timeOffset);
-      console.log(`Starttime: ${new Date(startTime).toLocaleTimeString()}`);
-      startCountdown(startTime);
-      animateBackgroundColor(blinkConfig, startTime, animationId);
     }
 
     function startCountdown(startTime) {
@@ -439,9 +434,9 @@
           // Determine wait time based on character
           let duration;
           if (char === '.') {
-            duration = 250;
+            duration = DURATIONS.DOT;
           } else if (char === '-') {
-            duration = 750;
+            duration = DURATIONS.DASH;
           }
 
           await new Promise(resolve => setTimeout(resolve, duration));
