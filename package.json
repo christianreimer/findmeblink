@@ -1,7 +1,12 @@
 {
   "scripts": {
+    "build:css": "tailwindcss -i app.css -o styles.css",
     "build:ts": "tsc",
-    "watch:ts": "tsc --watch"
+    "build": "npm run build:css && npm run build:ts",
+    "watch:css": "tailwindcss -i app.css -o styles.css --watch",
+    "watch:ts": "tsc --watch",
+    "watch": "npm run watch:css & npm run watch:ts",
+    "dev": "npm run watch"
   },
   "dependencies": {
     "@tailwindcss/cli": "^4.1.14",
