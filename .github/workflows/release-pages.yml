@@ -48,7 +48,6 @@ jobs:
           [ -f styles.css ] && cp styles.css dist/
           [ -f code.js ] && cp code.js dist/
           [ -f preview.png ] && cp preview.png dist/
-          [ -d public ] && cp -R public/* dist/ || true
 
       - name: Upload artifact for Pages
         uses: actions/upload-pages-artifact@v3
