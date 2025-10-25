@@ -177,22 +177,88 @@ async function handlePlayClick() {
         console.log(`Encoded url:${shareUrl}`)
 
         // Use Web Share API if available
-        if (navigator.share) {
-            try {
+        try {
+            if (navigator.share) {
                 await navigator.share({
                     title: 'Find My B.link',
                     text: 'Use this link to sync your screen flashing with mine!',
                     url: shareUrl
                 });
                 console.log('Shared successfully');
-            } catch (error) {
-                // User cancelled or share failed
-                if (error instanceof Error && error.name !== 'AbortError') {
-                    console.error('Error sharing:', error);
-                }
+            } else {
+                throw new Error('Share not available');
             }
-        } else {
-            console.log('Web Share API not available. URL encoded:', shareUrl);
+        } catch (error) {
+            // Share failed or not available - show fallback message
+            const urlToCopy = shareUrl; // Capture in closure
+
+            // Check if clipboard API is available
+            const hasClipboard = !!navigator.clipboard;
+            console.log('Clipboard API available:', hasClipboard);
+
+            const copyToClipboard = async () => {
+                console.log('Copy button clicked, attempting to copy:', urlToCopy);
+                try {
+                    if (!navigator.clipboard) {
+                        console.error('Clipboard API not available');
+                        alert('Clipboard not available. Please copy manually: ' + urlToCopy);
+                        return;
+                    }
+                    await navigator.clipboard.writeText(urlToCopy || '');
+                    console.log('Successfully copied to clipboard:', urlToCopy);
+                    // Show feedback that it was copied
+                    const copyButton = document.getElementById('copyButton');
+                    if (copyButton) {
+                        copyButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>`;
+                        setTimeout(() => {
+                            copyButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                            </svg>`;
+                        }, 2000);
+                    }
+                } catch (err) {
+                    console.error('Failed to copy to clipboard:', err);
+                    alert('Failed to copy. Please copy manually: ' + urlToCopy);
+                }
+            };
+
+            instructions.innerHTML = `
+                <p class="mb-2">Unable to share the Find My Blink link. <br/><br/> ${hasClipboard ? 'Copy' : 'Please copy'} the link below and send it to the person you are trying to locate.</p>
+                <div class="flex items-center gap-2 mt-2">
+                    <a href="#" id="shareUrlLink" class="flex-1 underline text-info break-all text-xs">${urlToCopy}</a>
+                    ${hasClipboard ? `<button id="copyButton" class="btn btn-sm btn-square btn-info" title="Copy">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                    </button>` : ''}
+                </div>
+            `;
+
+            // Add click handlers directly without setTimeout
+            const shareUrlLink = document.getElementById('shareUrlLink');
+            const copyButton = document.getElementById('copyButton');
+
+            if (shareUrlLink && hasClipboard) {
+                shareUrlLink.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    console.log('Share URL link clicked');
+                    await copyToClipboard();
+                });
+            }
+
+            if (copyButton && hasClipboard) {
+                copyButton.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    console.log('Copy button clicked');
+                    await copyToClipboard();
+                });
+            }
+
+            return; // Don't proceed with countdown
         }
     }
 

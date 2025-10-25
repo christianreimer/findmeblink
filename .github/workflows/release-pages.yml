@@ -1,9 +1,9 @@
 name: Release → Build TS → Deploy to Pages
 
 on:
-  push:
-    tags:
-      - 'v*'
+  # push:
+  #   tags:
+  #     - 'v*'
   release:
     types: [published]
 
