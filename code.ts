@@ -16,8 +16,6 @@ enum State {
     WELCOME = 'welcome',
     COUNTDOWN = 'countdown',
     RUNNING = 'running',
-    PAUSED = 'paused',
-    RESUMED = 'resumed',
 }
 
 enum Role {
@@ -66,7 +64,6 @@ let currentAnimationId: number = 0; // Track the current animation to cancel old
 let startTime: number;
 
 const playButton = document.getElementById('playButton')!;
-const pauseButton = document.getElementById('pauseButton')!;
 const cancelButton = document.getElementById('cancelButton')!;
 const countdownText = document.getElementById('countdownText')!;
 const instructions = document.getElementById('instructions')!;
@@ -77,9 +74,8 @@ function updateUI(): void {
 
     switch (currentState) {
         case State.WELCOME:
-            // playButton visible, pauseButton hidden, cancelButton hidden, countdownText empty
+            // playButton visible, cancelButton hidden, countdownText empty
             playButton.classList.remove('hidden');
-            pauseButton.classList.add('hidden');
             cancelButton.classList.add('hidden');
             countdownText.innerHTML = "&nbsp;"
             countdownText.classList.remove('hidden');
@@ -96,9 +92,8 @@ function updateUI(): void {
             break;
 
         case State.COUNTDOWN:
-            // playButton hidden, pauseButton hidden, cancelButton visible, countdownText shows countdown
+            // playButton hidden, cancelButton visible, countdownText shows countdown
             playButton.classList.add('hidden');
-            pauseButton.classList.add('hidden');
             cancelButton.classList.remove('hidden');
             countdownText.classList.remove('hidden');
             countdownText.textContent = 'Starting in 3';
@@ -108,36 +103,11 @@ function updateUI(): void {
             break;
 
         case State.RUNNING:
-            // pauseButton visible, cancelButton visible, playButton hidden
+            // cancelButton visible, playButton hidden
             playButton.classList.add('hidden');
-            pauseButton.classList.remove('hidden');
             cancelButton.classList.remove('hidden');
             instructions.classList.add('hidden');
             countdownText.classList.add('hidden');
-            // Allow background flashing to continue
-            shouldPauseBackground = false;
-            break;
-
-        case State.PAUSED:
-            // playButton visible, pauseButton hidden, cancelButton visible
-            playButton.classList.remove('hidden');
-            pauseButton.classList.add('hidden');
-            cancelButton.classList.remove('hidden');
-            instructions.classList.add('hidden');
-            countdownText.classList.add('hidden');
-            // Pause background flashing and reset to default color
-            shouldPauseBackground = true;
-            isBackgroundFlashing = false;
-            body.style.backgroundColor = defaultColor;
-            break;
-
-        case State.RESUMED:
-            // playButton hidden, pauseButton visible, cancelButton visible
-            playButton.classList.add('hidden');
-            pauseButton.classList.remove('hidden');
-            cancelButton.classList.remove('hidden');
-            instructions.classList.add('hidden');
-            countdownText.classList.remove('hidden');
             // Allow background flashing to continue
             shouldPauseBackground = false;
             break;
@@ -171,8 +141,8 @@ async function handlePlayClick() {
 
         console.log('Initialized blinkConfig on first play:', blinkConfig);
 
-        // Encode URL and share when INITIATOR first starts
-        const shareUrl = encodeUrl();
+        // Generate share URL (but don't update browser URL for INITIATOR)
+        const shareUrl = generateShareUrl();
 
         console.log(`Encoded url:${shareUrl}`)
 
@@ -226,10 +196,10 @@ async function handlePlayClick() {
             };
 
             instructions.innerHTML = `
-                <p class="mb-2">Unable to share the Find My Blink link. <br/><br/> ${hasClipboard ? 'Copy' : 'Please copy'} the link below and send it to the person you are trying to locate.</p>
-                <div class="flex items-center gap-2 mt-2">
+                <p class="mb-2">Unable to share the Find My Blink link. <br/><br/> ${hasClipboard ? 'Copy' : 'Please copy'} the link below and send it to the person you are trying to locate.<br /> <br />Once shared, click the play button.</p>
+                <div class="flex items-center gap-1 mt-2">
                     <a href="#" id="shareUrlLink" class="flex-1 underline text-info break-all text-xs">${urlToCopy}</a>
-                    ${hasClipboard ? `<button id="copyButton" class="btn btn-sm btn-square btn-info" title="Copy">
+                    ${hasClipboard ? `<button id="copyButton" class="btn btn-sm btn-square" style="background-color: white; color: black;" title="Copy">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                             <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
@@ -262,12 +232,8 @@ async function handlePlayClick() {
         }
     }
 
-    // Calculate next start time and begin countdown/blinking
-    if (currentState === State.PAUSED) {
-        setState(State.RESUMED);
-    } else {
-        setState(State.COUNTDOWN);
-    }
+    // Start countdown/blinking
+    setState(State.COUNTDOWN);
 
     currentAnimationId++;
     const animationId = currentAnimationId;
@@ -280,12 +246,32 @@ async function handlePlayClick() {
     }
 }
 
-function handlePauseClick() {
-    setState(State.PAUSED);
-}
-
 function handleCancelClick() {
     blinkConfig = null;
+
+    // Reset instructions to original content based on role
+    if (currentRole === Role.RECEIVER) {
+        instructions.innerHTML = `
+            <h2 class="text-xl font-bold">How to use</h2>
+            <div class="text-sm">
+                <p class="mt-2">Click the play button above. This will start a synchronized Find My Blink (pattern and colors).</p>
+            </div>
+        `;
+    } else {
+        instructions.innerHTML = `
+            <h2 class="text-xl font-bold">How to use</h2>
+            <div class="text-sm">
+                <p class="mt-2">Click the play button above. This will generate a unique Find My Blink (pattern and
+                    colors) that can be sent to one (or more) people.</p>
+
+                <p class="mt-2">Share the Find My Blink and their phone will synchronize with your flashing. Hold up
+                    you phone screen to help them find you.</p>
+
+                <p class="mt-2">No account is needed, no information is stored.</p>
+            </div>
+        `;
+    }
+
     setState(State.WELCOME);
 }
 
@@ -493,7 +479,7 @@ function animateBackgroundColor(config: BlinkConfig, startTime: number, animatio
     runPattern();
 };
 
-function encodeUrl(): string | undefined {
+function generateShareUrl(): string | undefined {
     if (!blinkConfig) return;
 
     // Find indices of colors and pattern
@@ -509,9 +495,19 @@ function encodeUrl(): string | undefined {
     params.set('t', blinkConfig.timeOffset.toString());
 
     const newUrl = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
-    window.history.replaceState({}, '', newUrl);
 
     return newUrl;
+}
+
+function encodeUrl(): string | undefined {
+    const url = generateShareUrl();
+
+    // Only update browser URL for RECEIVER role
+    if (url && currentRole === Role.RECEIVER) {
+        window.history.replaceState({}, '', url);
+    }
+
+    return url;
 }
 
 function decodeUrl(): BlinkConfig | null {
@@ -548,7 +544,6 @@ function decodeUrl(): BlinkConfig | null {
 window.addEventListener('DOMContentLoaded', () => {
     // Check if URL contains encoded blinkConfig
     playButton.addEventListener('click', handlePlayClick);
-    pauseButton.addEventListener('click', handlePauseClick);
     cancelButton.addEventListener('click', handleCancelClick);
 
     updateUI();
@@ -560,6 +555,13 @@ window.addEventListener('DOMContentLoaded', () => {
         blinkConfig = decodedConfig;
         currentRole = Role.RECEIVER;
         console.log('Receiver mode: blinkConfig loaded from URL', blinkConfig);
-        handlePlayClick();
+
+        // Update instructions for receiver
+        instructions.innerHTML = `
+            <h2 class="text-xl font-bold">How to use</h2>
+            <div class="text-sm">
+                <p class="mt-2">Click the play button above. This will start a synchronized Find My Blink (pattern and colors).</p>
+            </div>
+        `;
     }
 });
