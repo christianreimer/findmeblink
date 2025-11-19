@@ -134,7 +134,7 @@ function updateUI(): void {
 // Function to transition to a new state
 function setState(newState: State): void {
     const oldState = currentState;
-    console.log(`State change: ${oldState} -> ${newState}`);
+    // console.log(`State change: ${oldState} -> ${newState}`);
     currentState = newState;
     updateUI();
 }
@@ -150,10 +150,10 @@ async function handlePlayClick() {
             timeOffset: Math.floor(Math.random() * 5)
         };
 
-        console.log('Initialized blinkConfig on first play:', blinkConfig);
+        // console.log('Initialized blinkConfig on first play:', blinkConfig);
 
         const shareUrl = generateShareUrl();
-        console.log(`Encoded url:${shareUrl}`)
+        // console.log(`Encoded url:${shareUrl}`)
 
         // Try to share, show fallback if it fails
         if (!await tryShare(shareUrl)) {
@@ -168,7 +168,7 @@ async function handlePlayClick() {
 
     if (blinkConfig) {
         startTime = getNextStartTime(blinkConfig.timeOffset);
-        console.log(`Starttime: ${new Date(startTime).toLocaleTimeString()}`);
+        // console.log(`Starttime: ${new Date(startTime).toLocaleTimeString()}`);
         startCountdown(startTime);
         animateBackgroundColor(blinkConfig, startTime, currentAnimationId);
     }
@@ -182,7 +182,7 @@ async function tryShare(url: string | undefined): Promise<boolean> {
                 text: 'Use this link to sync your screen flashing with mine!',
                 url: url
             });
-            console.log('Shared successfully');
+            // console.log('Shared successfully');
             return true;
         }
         return false;
@@ -193,7 +193,7 @@ async function tryShare(url: string | undefined): Promise<boolean> {
 
 function showShareFallback(urlToCopy: string | undefined): void {
     const hasClipboard = !!navigator.clipboard;
-    console.log('Clipboard API available:', hasClipboard);
+    // console.log('Clipboard API available:', hasClipboard);
 
     const copyIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
@@ -215,14 +215,14 @@ function showShareFallback(urlToCopy: string | undefined): void {
     if (!hasClipboard) return;
 
     const copyToClipboard = async () => {
-        console.log('Copy button clicked, attempting to copy:', urlToCopy);
+        // console.log('Copy button clicked, attempting to copy:', urlToCopy);
         try {
             if (!navigator.clipboard) {
                 alert('Clipboard not available. Please copy manually: ' + urlToCopy);
                 return;
             }
             await navigator.clipboard.writeText(urlToCopy || '');
-            console.log('Successfully copied to clipboard:', urlToCopy);
+            // console.log('Successfully copied to clipboard:', urlToCopy);
 
             const copyButton = document.getElementById('copyButton');
             if (copyButton) {
@@ -487,7 +487,21 @@ window.addEventListener('DOMContentLoaded', () => {
     if (decodedConfig) {
         blinkConfig = decodedConfig;
         currentRole = Role.RECEIVER;
-        console.log('Receiver mode: blinkConfig loaded from URL', blinkConfig);
+        // console.log('Receiver mode: blinkConfig loaded from URL', blinkConfig);
         instructions.innerHTML = INSTRUCTIONS.RECEIVER;
+    }
+
+    const words = ['friend', 'bestie', 'soulmate', 'bae', 'partner'];
+    let currentIndex = 0;
+    const wordElement = document.getElementById('wordSwap');
+
+    if (wordElement) {
+        setInterval(() => {
+            currentIndex = (currentIndex + 1) % words.length;
+            wordElement.classList.remove('word-fade');
+            void wordElement.offsetWidth;
+            wordElement.textContent = words[currentIndex];
+            wordElement.classList.add('word-fade');
+        }, 2000);
     }
 });
