@@ -1,2 +1,43 @@
 @import "tailwindcss";
 @plugin "daisyui";
+
+.rotate10 {
+    transform: rotate(10deg);
+    transform-origin: center;
+}
+
+#phoneHolder {
+    transition: color 150ms ease-in-out;
+}
+
+.word-swap {
+    display: inline-block;
+    min-width: 100px;
+    text-align: left;
+}
+
+.word-fade {
+    animation: fadeInOut 2s ease-in-out;
+}
+
+@keyframes fadeInOut {
+    0% {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    20% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    80% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+}
