@@ -47,7 +47,7 @@ jobs:
           [ -f index.html ] && cp index.html dist/
           [ -f styles.css ] && cp styles.css dist/
           [ -f code.js ] && cp code.js dist/
-          [ -f preview.png ] && cp preview.png dist/
+          [ -f assets/preview.png ] && cp assets/preview.png dist/
 
       - name: Upload artifact for Pages
         uses: actions/upload-pages-artifact@v3
