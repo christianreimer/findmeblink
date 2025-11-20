@@ -43,15 +43,7 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Inject version into HTML
-        run: |
-          TAG="${{ steps.get_tag.outputs.tag }}"
-          sed -i "s|<div id=\"version\" class=\"fixed bottom-4 left-4 text-xs opacity-50\">v?.?.?</div>|<div id=\"version\" class=\"fixed bottom-4 left-4 text-xs opacity-50\">$TAG</div>|g" dist/index.html
-          echo "Injected version $TAG into index.html"
-
-      # Make sure your final static files live in ./dist
-      # e.g., copy index.html and assets if your build step didn't already
-      - name: Copy static files (optional)
+      - name: Copy static files
         run: |
           mkdir -p dist
           [ -f index.html ] && cp index.html dist/ || true
@@ -60,6 +52,12 @@ jobs:
           [ -f assets/preview.png ] && cp assets/preview.png dist/ || true
           [ -f penguins.mp4 ] && cp penguins.mp4 dist/ || true
           [ -f app.css ] && cp app.css dist/ || true
+
+      - name: Inject version into HTML
+        run: |
+          TAG="${{ steps.get_tag.outputs.tag }}"
+          sed -i "s|<div id=\"version\" class=\"fixed bottom-4 left-4 text-xs opacity-50\">v?.?.?</div>|<div id=\"version\" class=\"fixed bottom-4 left-4 text-xs opacity-50\">$TAG</div>|g" dist/index.html
+          echo "Injected version $TAG into index.html"
 
       - name: Upload artifact for Pages
         uses: actions/upload-pages-artifact@v3
