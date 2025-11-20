@@ -1,9 +1,6 @@
 name: Release → Build TS → Deploy to Pages
 
 on:
-  # push:
-  #   tags:
-  #     - 'v*'
   release:
     types: [published]
 
@@ -27,6 +24,13 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Get latest tag
+        id: get_tag
+        run: |
+          TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "Latest tag: $TAG"
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -39,15 +43,23 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Inject version into HTML
+        run: |
+          TAG="${{ steps.get_tag.outputs.tag }}"
+          sed -i "s|<div id=\"version\" class=\"fixed bottom-4 left-4 text-xs opacity-50\">v?.?.?</div>|<div id=\"version\" class=\"fixed bottom-4 left-4 text-xs opacity-50\">$TAG</div>|g" dist/index.html
+          echo "Injected version $TAG into index.html"
+
       # Make sure your final static files live in ./dist
-      # e.g., copy index.html and assets if your build step didn’t already
+      # e.g., copy index.html and assets if your build step didn't already
       - name: Copy static files (optional)
         run: |
           mkdir -p dist
-          [ -f index.html ] && cp index.html dist/
-          [ -f styles.css ] && cp styles.css dist/
-          [ -f code.js ] && cp code.js dist/
-          [ -f assets/preview.png ] && cp assets/preview.png dist/
+          [ -f index.html ] && cp index.html dist/ || true
+          [ -f styles.css ] && cp styles.css dist/ || true
+          [ -f code.js ] && cp code.js dist/ || true
+          [ -f assets/preview.png ] && cp assets/preview.png dist/ || true
+          [ -f penguins.mp4 ] && cp penguins.mp4 dist/ || true
+          [ -f app.css ] && cp app.css dist/ || true
 
       - name: Upload artifact for Pages
         uses: actions/upload-pages-artifact@v3
